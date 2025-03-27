@@ -12,10 +12,8 @@ lightning
 # データ前処理
 numpy
 pandas
-librosa
 soundfile
 tqdm
-matplotlib
 
 # MIDI・音楽処理
 pretty_midi
@@ -26,5 +24,4 @@ nnAudio
 transformers
 
 # その他
-requests  # ckpt自動ダウンロードなどに備えて
 gdown

@@ -3,7 +3,6 @@ import torch
 import torchaudio
 import os
 import subprocess
-import requests
 import gdown
 
 from utils import unpack_sequence, token_seg_list_to_midi
@@ -12,16 +11,7 @@ from utils import rms_normalize_wav
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# モデルの初期化（Flask起動時に一度だけ行う）
-args = {
-    "n_mels": 128,
-    "sample_rate": 16000,
-    "n_fft": 1024,
-    "hop_length": 128,
-}
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 def download_ckpt_if_needed():
     ckpt_path = os.path.join(BASE_DIR, "model.ckpt")
@@ -33,15 +23,22 @@ def download_ckpt_if_needed():
     file_id = "1L66XwYCnfUuAM_B9Tb5Z-nl46OKGDYfS"
     gdown.download(id=file_id, output=ckpt_path, quiet=False)
 
+# グローバルで model を持たないようにする
 
-# 追加：
-download_ckpt_if_needed()
-# 変更：
-checkpoint_path = os.path.join(BASE_DIR, "model.ckpt")
+def load_model():
+    checkpoint_path = os.path.join(BASE_DIR, "model.ckpt")
+    args = {
+        "n_mels": 128,
+        "sample_rate": 16000,
+        "n_fft": 1024,
+        "hop_length": 128,
+    }
+    model = LitTranscriber(transcriber_args=args, lr=1e-4, lr_decay=0.99)
+    model = LitTranscriber.load_from_checkpoint(checkpoint_path).to(device)
+    model.eval()
+    return model
 
-model = LitTranscriber(transcriber_args=args, lr=1e-4, lr_decay=0.99)
-model = LitTranscriber.load_from_checkpoint(checkpoint_path=checkpoint_path).to(device)
-model.eval()
+
 
 def convert_to_pcm_wav(input_path, output_path):
     command = [
@@ -64,6 +61,10 @@ def infer_midi_from_wav(input_wav_path: str) -> str:
     Returns:
         str: 出力されたMIDIファイルのパス
     """
+    # 追加：
+    download_ckpt_if_needed()
+    model = load_model() 
+
     # 0. WAVファイルをPCM形式に変換
     converted_path = os.path.join(BASE_DIR, "converted_input.wav")
     convert_to_pcm_wav(input_wav_path, converted_path)

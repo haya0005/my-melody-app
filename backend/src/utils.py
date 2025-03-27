@@ -8,7 +8,6 @@ import torch.nn.functional as F
 import torchaudio
 from nnAudio.features import CQT
 import soundfile as sf
-import librosa
 
 from config import FRAME_PER_SEC, FRAME_STEP_SIZE_SEC, AUDIO_SEGMENT_SEC
 from config import voc_single_track
