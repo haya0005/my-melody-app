@@ -25,4 +25,4 @@ transformers
 
 # その他
 requests  # ckpt自動ダウンロードなどに備えて
-
+gdown
