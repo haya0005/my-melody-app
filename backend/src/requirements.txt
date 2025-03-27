@@ -1,0 +1,27 @@
+# Flask関連
+flask
+flask-cors
+
+# 推論・学習用ライブラリ
+torch
+torchaudio
+pytorch-lightning
+
+# データ前処理
+numpy
+pandas
+librosa
+soundfile
+tqdm
+matplotlib
+
+# MIDI・音楽処理
+pretty_midi
+mir_eval
+
+# モデル構成・特徴抽出
+nnAudio
+transformers
+
+# その他
+requests  # ckpt自動ダウンロードなどに備えて
