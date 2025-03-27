@@ -6,6 +6,8 @@ flask-cors
 torch
 torchaudio
 pytorch-lightning
+lightning
+
 
 # データ前処理
 numpy
