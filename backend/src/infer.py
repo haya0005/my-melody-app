@@ -3,6 +3,8 @@ import torch
 import torchaudio
 import os
 import subprocess
+import requests
+import gdown
 
 from utils import unpack_sequence, token_seg_list_to_midi
 from train import LitTranscriber
@@ -20,8 +22,23 @@ args = {
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# checkpoint のパスは、必要に応じて環境変数化や引数で制御してもよい
-checkpoint_path = "/Users/yagihayato/Downloads/my-melody-app/backend/data/0210_cqt_hop128_epochepoch=390-vali_lossvali_loss=0.40.ckpt"
+
+def download_ckpt_if_needed():
+    ckpt_path = os.path.join(BASE_DIR, "model.ckpt")
+    if os.path.exists(ckpt_path):
+        print("✅ Checkpoint already exists.")
+        return
+
+    print("⬇️ Downloading checkpoint via gdown...")
+    file_id = "1L66XwYCnfUuAM_B9Tb5Z-nl46OKGDYfS"
+    gdown.download(id=file_id, output=ckpt_path, quiet=False)
+
+
+# 追加：
+download_ckpt_if_needed()
+# 変更：
+checkpoint_path = os.path.join(BASE_DIR, "model.ckpt")
+
 model = LitTranscriber(transcriber_args=args, lr=1e-4, lr_decay=0.99)
 model = LitTranscriber.load_from_checkpoint(checkpoint_path=checkpoint_path).to(device)
 model.eval()
